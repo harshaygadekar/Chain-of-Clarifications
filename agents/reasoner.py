@@ -24,16 +24,29 @@ class ReasonerAgent(BaseAgent):
 
     def __init__(
         self,
-        model_name: str = "gpt2",
+        model_name: str = "google/flan-t5-base",
         device: Optional[str] = None,
-        max_length: int = 1024
+        max_length: int = 1024,
+        model: Optional[Any] = None,
+        tokenizer: Optional[Any] = None
     ):
-        """Initialize the Reasoner agent."""
+        """
+        Initialize the Reasoner agent.
+
+        Args:
+            model_name: Hugging Face model identifier
+            device: Computing device
+            max_length: Maximum sequence length
+            model: Pre-loaded model (optional, for sharing)
+            tokenizer: Pre-loaded tokenizer (optional, for sharing)
+        """
         super().__init__(
             role="reasoner",
             model_name=model_name,
             device=device,
-            max_length=max_length
+            max_length=max_length,
+            model=model,
+            tokenizer=tokenizer
         )
 
     def get_prompt(
@@ -138,21 +151,72 @@ Your Analysis and Answer:"""
         Returns:
             Extracted answer string
         """
-        # Simple heuristic: look for "Answer:" or similar patterns
         import re
+
+        # Check for error markers first
+        if reasoning_output.startswith("[ERROR:"):
+            logger.error(f"Reasoner: Error in reasoning output: {reasoning_output}")
+            return reasoning_output
 
         # Try to find explicit answer markers
         patterns = [
             r'Answer:\s*(.+?)(?:\n|$)',
             r'The answer is\s*(.+?)(?:\n|\.)',
             r'Therefore,?\s*(.+?)(?:\n|\.)',
+            r'Conclusion:\s*(.+?)(?:\n|$)',
+            r'Final answer:\s*(.+?)(?:\n|$)',
         ]
 
         for pattern in patterns:
             match = re.search(pattern, reasoning_output, re.IGNORECASE)
             if match:
-                return match.group(1).strip()
+                answer = match.group(1).strip()
+                # Validate extracted answer doesn't look like prompt
+                if self._is_valid_answer(answer):
+                    return answer
 
-        # Fallback: return first sentence
-        sentences = reasoning_output.split('.')
-        return sentences[0].strip() if sentences else reasoning_output[:100]
+        # Improved fallback: use last meaningful sentence instead of first
+        # (conclusions often come at the end)
+        sentences = [s.strip() for s in reasoning_output.split('.') if s.strip()]
+
+        # Try last sentences first
+        for sent in reversed(sentences):
+            if self._is_valid_answer(sent):
+                return sent
+
+        # If no valid sentence found, return truncated output with warning
+        logger.warning(f"Reasoner: Could not extract clean answer, returning truncated output")
+        return reasoning_output[:100].strip() if reasoning_output else "[ERROR: Empty reasoning output]"
+
+    def _is_valid_answer(self, answer: str) -> bool:
+        """
+        Check if extracted answer is valid (not prompt-like).
+
+        Args:
+            answer: Candidate answer string
+
+        Returns:
+            True if answer appears valid
+        """
+        if not answer or len(answer) < 3:
+            return False
+
+        # Check if it looks like a prompt instruction
+        prompt_indicators = [
+            'your task is',
+            'you are a',
+            'carefully read',
+            'apply logical',
+            'formulate a',
+            'provide your',
+            'task:',
+            'question:',
+            'relevant information:',
+        ]
+
+        answer_lower = answer.lower()
+        for indicator in prompt_indicators:
+            if indicator in answer_lower:
+                return False
+
+        return True

@@ -24,16 +24,29 @@ class RetrieverAgent(BaseAgent):
 
     def __init__(
         self,
-        model_name: str = "gpt2",
+        model_name: str = "google/flan-t5-base",
         device: Optional[str] = None,
-        max_length: int = 1024
+        max_length: int = 1024,
+        model: Optional[Any] = None,
+        tokenizer: Optional[Any] = None
     ):
-        """Initialize the Retriever agent."""
+        """
+        Initialize the Retriever agent.
+
+        Args:
+            model_name: Hugging Face model identifier
+            device: Computing device
+            max_length: Maximum sequence length
+            model: Pre-loaded model (optional, for sharing)
+            tokenizer: Pre-loaded tokenizer (optional, for sharing)
+        """
         super().__init__(
             role="retriever",
             model_name=model_name,
             device=device,
-            max_length=max_length
+            max_length=max_length,
+            model=model,
+            tokenizer=tokenizer
         )
 
     def get_prompt(

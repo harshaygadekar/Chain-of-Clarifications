@@ -24,16 +24,29 @@ class VerifierAgent(BaseAgent):
 
     def __init__(
         self,
-        model_name: str = "gpt2",
+        model_name: str = "google/flan-t5-base",
         device: Optional[str] = None,
-        max_length: int = 1024
+        max_length: int = 1024,
+        model: Optional[Any] = None,
+        tokenizer: Optional[Any] = None
     ):
-        """Initialize the Verifier agent."""
+        """
+        Initialize the Verifier agent.
+
+        Args:
+            model_name: Hugging Face model identifier
+            device: Computing device
+            max_length: Maximum sequence length
+            model: Pre-loaded model (optional, for sharing)
+            tokenizer: Pre-loaded tokenizer (optional, for sharing)
+        """
         super().__init__(
             role="verifier",
             model_name=model_name,
             device=device,
-            max_length=max_length
+            max_length=max_length,
+            model=model,
+            tokenizer=tokenizer
         )
 
     def get_prompt(
@@ -144,27 +157,73 @@ Your Verification and Final Answer:"""
         """
         import re
 
+        # Check for error markers first
+        if verification_output.startswith("[ERROR:"):
+            logger.error(f"Verifier: Error in verification output: {verification_output}")
+            return verification_output
+
         # Try to find explicit answer markers
         patterns = [
             r'Final Answer:\s*(.+?)(?:\n|$)',
             r'Answer:\s*(.+?)(?:\n|$)',
             r'Verified Answer:\s*(.+?)(?:\n|$)',
             r'The answer is\s*(.+?)(?:\n|\.)',
+            r'Conclusion:\s*(.+?)(?:\n|$)',
         ]
 
         for pattern in patterns:
             match = re.search(pattern, verification_output, re.IGNORECASE)
             if match:
-                return match.group(1).strip()
+                answer = match.group(1).strip()
+                # Validate extracted answer doesn't look like prompt
+                if self._is_valid_answer(answer):
+                    return answer
 
-        # Fallback: return first meaningful sentence
-        sentences = verification_output.split('.')
-        for sent in sentences:
-            sent = sent.strip()
-            if len(sent) > 5:  # Skip very short fragments
+        # Improved fallback: use last meaningful sentence instead of first
+        # (final answer often comes at the end)
+        sentences = [s.strip() for s in verification_output.split('.') if s.strip()]
+
+        # Try last sentences first
+        for sent in reversed(sentences):
+            if self._is_valid_answer(sent):
                 return sent
 
+        # If no valid sentence found, return truncated output with warning
+        logger.warning(f"Verifier: Could not extract clean answer, returning truncated output")
         return verification_output[:100].strip()
+
+    def _is_valid_answer(self, answer: str) -> bool:
+        """
+        Check if extracted answer is valid (not prompt-like).
+
+        Args:
+            answer: Candidate answer string
+
+        Returns:
+            True if answer appears valid
+        """
+        if not answer or len(answer) < 3:
+            return False
+
+        # Check if it looks like a prompt instruction
+        prompt_indicators = [
+            'your task is',
+            'you are a',
+            'review the',
+            'check if',
+            'identify any',
+            'provide your',
+            'task:',
+            'question:',
+            'passage:',
+        ]
+
+        answer_lower = answer.lower()
+        for indicator in prompt_indicators:
+            if indicator in answer_lower:
+                return False
+
+        return True
 
     def extract_confidence(self, verification_output: str) -> str:
         """

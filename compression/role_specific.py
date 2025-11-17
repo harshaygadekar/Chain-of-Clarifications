@@ -329,13 +329,14 @@ class Clarifier:
         Returns:
             Adjusted compression ratio
         """
-        if not importance_scores:
+        if not importance_scores or len(importance_scores) == 0:
             return target
 
         # Count high-importance sentences (score > 0.7)
-        high_importance_fraction = sum(
+        high_importance_count = sum(
             1 for s in importance_scores if s > 0.7
-        ) / len(importance_scores)
+        )
+        high_importance_fraction = high_importance_count / len(importance_scores)
 
         # Adjust ratio
         if high_importance_fraction > 0.6:

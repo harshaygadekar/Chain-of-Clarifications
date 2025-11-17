@@ -1,0 +1,73 @@
+{
+  "experiment_name": "none_0.5_20251117_205416",
+  "configuration": {
+    "model_name": "gpt2",
+    "compression_type": "none",
+    "compression_ratio": 0.5,
+    "num_examples": 2
+  },
+  "metrics": {
+    "predictions": [
+      "You are a verification specialist",
+      "Your Verification\n\n2"
+    ],
+    "ground_truths": [
+      "Denver Broncos",
+      "Carolina Panthers"
+    ],
+    "f1_scores": [
+      0.0,
+      0.0
+    ],
+    "em_scores": [
+      0.0,
+      0.0
+    ],
+    "context_sizes": {
+      "retriever": [
+        245,
+        270
+      ],
+      "retriever_compressed": [
+        245,
+        270
+      ],
+      "reasoner": [
+        236,
+        225
+      ],
+      "reasoner_compressed": [
+        236,
+        225
+      ]
+    },
+    "latencies": [
+      50.27733516693115,
+      49.990078926086426
+    ],
+    "success_flags": [
+      true,
+      true
+    ],
+    "errors": [],
+    "memory_usage": [
+      {
+        "allocated_mb": 0,
+        "reserved_mb": 0,
+        "max_allocated_mb": 0
+      },
+      {
+        "allocated_mb": 0,
+        "reserved_mb": 0,
+        "max_allocated_mb": 0
+      }
+    ],
+    "summary": {
+      "f1_mean": 0.0,
+      "f1_std": 0.0,
+      "f1_median": 0.0,
+      "em_mean": 0.0,
+      "em_std": 0.0,
+      "retriever_context_mean": 257.5,
+      "retriever_context_std": 12.5,
+      "retriever_context_max": 

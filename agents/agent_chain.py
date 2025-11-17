@@ -5,7 +5,7 @@ Coordinates the multi-agent pipeline: Retriever → Reasoner → Verifier
 Handles context passing, compression, and result aggregation.
 """
 
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, Tuple
 from agents.retriever import RetrieverAgent
 from agents.reasoner import ReasonerAgent
 from agents.verifier import VerifierAgent
@@ -13,6 +13,8 @@ from compression.naive_compression import NaiveCompressor
 from compression.role_specific import Clarifier
 import time
 import logging
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSeq2SeqLM
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +31,7 @@ class AgentChain:
 
     def __init__(
         self,
-        model_name: str = "gpt2",
+        model_name: str = "google/flan-t5-base",
         device: Optional[str] = None,
         compression_type: str = "none",
         compression_ratio: float = 0.5
@@ -48,27 +50,111 @@ class AgentChain:
         self.compression_type = compression_type
         self.compression_ratio = compression_ratio
 
-        # Initialize agents
-        logger.info("Initializing agent chain...")
+        # Load shared model once for all agents
+        logger.info("Initializing agent chain with shared model architecture...")
+        self.shared_model, self.shared_tokenizer = self._load_shared_model()
+
+        # Initialize agents with shared model
+        logger.info("Initializing agents with shared model...")
         self.retriever = RetrieverAgent(
             model_name=model_name,
-            device=device
+            device=device,
+            model=self.shared_model,
+            tokenizer=self.shared_tokenizer
         )
         self.reasoner = ReasonerAgent(
             model_name=model_name,
-            device=device
+            device=device,
+            model=self.shared_model,
+            tokenizer=self.shared_tokenizer
         )
         self.verifier = VerifierAgent(
             model_name=model_name,
-            device=device
+            device=device,
+            model=self.shared_model,
+            tokenizer=self.shared_tokenizer
         )
 
         # Initialize compression modules
         self._init_compression()
 
         logger.info(
-            f"Agent chain initialized with {compression_type} compression"
+            f"Agent chain initialized with {compression_type} compression and shared model"
         )
+
+    def _load_shared_model(self) -> Tuple[Any, Any]:
+        """
+        Load the model and tokenizer once to be shared across all agents.
+
+        Returns:
+            Tuple of (model, tokenizer)
+        """
+        logger.info(f"Loading shared model: {self.model_name}")
+
+        try:
+            # Load tokenizer
+            tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+
+            # Auto-detect device
+            if self.device is None:
+                device = "cuda" if torch.cuda.is_available() else "cpu"
+            else:
+                device = self.device
+
+            logger.info(f"Shared model will use device: {device}")
+
+            # Detect model type
+            is_t5_family = any(x in self.model_name.lower() for x in ['t5', 'flan'])
+
+            # Determine dtype
+            dtype = torch.float16 if device == "cuda" else torch.float32
+
+            # Load model based on type
+            if is_t5_family:
+                logger.info(f"Loading Seq2Seq model (T5 family)")
+                model = AutoModelForSeq2SeqLM.from_pretrained(
+                    self.model_name,
+                    torch_dtype=dtype
+                )
+            else:
+                logger.info(f"Loading CausalLM model")
+                model = AutoModelForCausalLM.from_pretrained(
+                    self.model_name,
+                    torch_dtype=dtype
+                )
+
+            # Move to device
+            if device == "cuda":
+                cuda_device = torch.device("cuda:0")
+                logger.info(f"Moving shared model to {cuda_device}")
+                model.to(cuda_device)
+
+                # Log GPU memory
+                if torch.cuda.is_available():
+                    allocated = torch.cuda.memory_allocated(0) / 1024**2
+                    reserved = torch.cuda.memory_reserved(0) / 1024**2
+                    logger.info(f"GPU Memory after shared model load:")
+                    logger.info(f"  Allocated: {allocated:.2f} MB")
+                    logger.info(f"  Reserved: {reserved:.2f} MB")
+            else:
+                model.to(device)
+                logger.info(f"Shared model loaded on CPU")
+
+            model.eval()
+
+            # Set pad token if needed
+            if tokenizer.pad_token is None:
+                if hasattr(tokenizer, 'eos_token') and tokenizer.eos_token is not None:
+                    tokenizer.pad_token = tokenizer.eos_token
+                else:
+                    tokenizer.pad_token = tokenizer.unk_token
+
+            logger.info(f"Shared model loaded successfully")
+            return model, tokenizer
+
+        except Exception as e:
+            logger.error(f"Failed to load shared model: {e}")
+            raise
 
     def _init_compression(self):
         """Initialize compression modules based on type."""

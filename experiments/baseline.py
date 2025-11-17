@@ -42,7 +42,7 @@ class ExperimentRunner:
 
     def __init__(
         self,
-        model_name: str = "gpt2",
+        model_name: str = "google/flan-t5-base",
         device: Optional[str] = None,
         output_dir: str = "results"
     ):
@@ -332,7 +332,7 @@ def main():
     parser.add_argument(
         '--model_name',
         type=str,
-        default='gpt2',
+        default='google/flan-t5-base',
         help='Model name from Hugging Face'
     )
 

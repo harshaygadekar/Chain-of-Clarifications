@@ -8,7 +8,7 @@ Supports statistical testing and comparative analysis.
 import json
 import argparse
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 import sys
 
 # Add parent directory to path
