@@ -1,0 +1,193 @@
+{
+  "experiment_name": "none_0.5_20251120_193342",
+  "configuration": {
+    "model_name": "gpt2",
+    "compression_type": "none",
+    "compression_ratio": 0.5,
+    "num_examples": 10
+  },
+  "metrics": {
+    "predictions": [
+      "1.\n\n2.\n\n3.\n\n4.\n\n5.\n\n6.\n\n7.\n\n8.\n\n9.\n\n10.\n\n11.\n\n12.\n\n13.\n\n14.\n\n15.\n\n16.\n\n17.\n\n18.\n\n19.\n\n20.\n\n21.\n\n22.",
+      "The information is incomplete and not accurate\n\n28",
+      "The following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe following is your final results were obtained from:\n\nThe",
+      "A total of 1,000 questions\n\n28",
+      "Players",
+      "You should be able to understand the question and your answer",
+      "You cannot complete the game plan, but you can complete the game plan and complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan and you can complete the game plan",
+      "Rate your confidence (High/Medium/Low)\n\nYour Verification and Final Answer:\n\n\"",
+      "The number of field goals",
+      "2. Test the logical consistency of your reasoning chain"
+    ],
+    "ground_truths": [
+      "Denver Broncos",
+      "Carolina Panthers",
+      "Santa Clara, California",
+      "Denver Broncos",
+      "gold",
+      "\"golden anniversary\"",
+      "February 7, 2016",
+      "American Football Conference",
+      "\"golden anniversary\"",
+      "American Football Conference"
+    ],
+    "f1_scores": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "em_scores": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "context_sizes": {
+      "retriever": [
+        289,
+        246,
+        290,
+        296,
+        174,
+        327,
+        310,
+        278,
+        319,
+        311
+      ],
+      "retriever_compressed": [
+        289,
+        246,
+        290,
+        296,
+        174,
+        327,
+        310,
+        278,
+        319,
+        311
+      ],
+      "reasoner": [
+        112,
+        327,
+        312,
+        336,
+        209,
+        355,
+        336,
+        323,
+        336,
+        347
+      ],
+      "reasoner_compressed": [
+        112,
+        327,
+        312,
+        336,
+        209,
+        355,
+        336,
+        323,
+        336,
+        347
+      ]
+    },
+    "latencies": [
+      5.951695442199707,
+      5.316800832748413,
+      5.264418125152588,
+      5.195925235748291,
+      5.33756685256958,
+      5.292275428771973,
+      6.386872053146362,
+      7.001047611236572,
+      7.216032981872559,
+      5.297816753387451
+    ],
+    "success_flags": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "errors": [],
+    "memory_usage": [
+      {
+        "allocated_mb": 263.6123046875,
+        "reserved_mb": 360.0,
+        "max_allocated_mb": 305.8466796875
+      },
+      {
+        "allocated_mb": 263.6123046875,
+        "reserved_mb": 360.0,
+        "max_allocated_mb": 305.84765625
+      },
+      {
+        "allocated_mb": 263.6123046875,
+        "reserved_mb": 360.0,
+        "max_allocated_mb": 305.84765625
+      },
+      {
+        "allocated_mb": 263.6123046875,
+        "reserved_mb": 360.0,
+        "max_allocated_mb": 305.84765625
+      },
+      {
+        "allocated_mb": 263.6123046875,
+        "reserved_mb": 362.0,
+        "max_allocated_mb": 305.84765625
+      },
+      {
+        "allocated_mb": 263.6123046875,
+        "reserved_mb": 360.0,
+        "max_allocated_mb": 305.84765625
+      },
+      {
+        "allocated_mb": 263.6123046875,
+        "reserved_mb": 360.0,
+        "max_allocated_mb": 305.84765625
+      },
+      {
+        "allocated_mb": 263.6123046875,
+        "reserved_mb": 362.0,
+        "max_allocated_mb": 305.84765625
+      },
+      {
+        "allocated_mb": 263.6123046875,
+        "reserved_mb": 362.0,
+        "max_allocated_mb": 305.84765625
+      },
+      {
+        "allocated_mb": 263.6123046875,
+        "reserved_mb": 362.0,
+        "max_allocated_mb": 305.84765625
+      }
+    ],
+    "summary": {
+      "f1_mean": 0.0,
+      "f1_std": 0.0,
+      "f1_median": 0.0,
+      "em_mean": 0.0,
+      "em_std": 0.0,
+      "retriever_context_mean": 284.0,
+      "retriever_context_std": 42.73640134592523,
+      "retriever_context_max": 
